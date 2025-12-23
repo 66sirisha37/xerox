@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 
 import com.example.xerox.userservice.dto.CreateUserRequest;
 import com.example.xerox.userservice.entity.User;
+import com.example.xerox.userservice.exceptions.BlankFieldException;
 import com.example.xerox.userservice.exceptions.InvalidRoleException;
 import com.example.xerox.userservice.exceptions.PasswordMismatchException;
 import com.example.xerox.userservice.exceptions.UsernameAlreadyExistsException;
 import com.example.xerox.userservice.repository.UserRepository;
-import com.example.xerox.userservice.entity.Role;
 
 
 @Service
@@ -30,6 +30,11 @@ public class UserService {
     }
 
     public void createUser(CreateUserRequest userRequest){
+        if (!(userRequest.getUsername().isBlank() || userRequest.getPassword().isBlank() ||
+            userRequest.getConfirmPassword().isBlank() || userRequest.getEmail().isBlank())){
+            throw new BlankFieldException("All fields are required");
+        }
+        
         if (!userRequest.getPassword().equals(userRequest.getConfirmPassword())){
             throw new PasswordMismatchException("Passwords do not match");
         }
