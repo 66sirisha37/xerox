@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.xerox.userservice.dto.CreateUserRequest;
 import com.example.xerox.userservice.entity.User;
+import com.example.xerox.userservice.exceptions.InvalidRoleException;
+import com.example.xerox.userservice.exceptions.PasswordMismatchException;
+import com.example.xerox.userservice.exceptions.UsernameAlreadyExistsException;
 import com.example.xerox.userservice.repository.UserRepository;
 import com.example.xerox.userservice.entity.Role;
 
@@ -28,15 +31,15 @@ public class UserService {
 
     public void createUser(CreateUserRequest userRequest){
         if (!userRequest.getPassword().equals(userRequest.getConfirmPassword())){
-            throw new RuntimeException("Passwords do not match");
+            throw new PasswordMismatchException("Passwords do not match");
         }
 
         if (repository.findByUsername(userRequest.getUsername()).isPresent()){
-            throw new RuntimeException("Username already exists");
+            throw new UsernameAlreadyExistsException("Username already exists");
         }
 
         if (userRequest.getRole() == null){
-            throw new RuntimeException("Role must be specified");
+            throw new InvalidRoleException("Role must be specified");
         }
         
         User user = new User();
