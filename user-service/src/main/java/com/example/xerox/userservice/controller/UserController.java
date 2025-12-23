@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/auth")
 public class UserController {
     private final UserService service;
     public UserController(UserService service) {
@@ -38,3 +38,4 @@ public class UserController {
         return ResponseEntity.status(201).body(response);
     }
 }
+
