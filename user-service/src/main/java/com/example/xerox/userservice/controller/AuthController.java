@@ -28,7 +28,7 @@ public class AuthController {
             @RequestBody LoginRequest request) {
 
         LoginResponse response = userService.loginUser(request);
-    
+
         Map<String, Object> responseBody = Map.of(
             "username", response.getUsername(),
             "message", response.getMessage(),

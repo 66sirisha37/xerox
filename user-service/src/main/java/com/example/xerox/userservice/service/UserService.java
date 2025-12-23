@@ -68,18 +68,16 @@ public class UserService {
 
     User user = repository.findByUsername(request.getUsername())
         .orElseThrow(() ->
-            new InvalidCredentialsException("Invalid username or password"));
+            new InvalidCredentialsException("Invalid username"));
 
     if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
         throw new InvalidCredentialsException("Invalid username or password");
     }
 
     return new LoginResponse(
-        "User logged in successfully", // ✅ correct order
+        "User logged in successfully",
         user.getUsername(),
         user.getRole()
     );
 }
-
-
 }
