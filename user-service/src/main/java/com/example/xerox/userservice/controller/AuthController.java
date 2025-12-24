@@ -32,7 +32,8 @@ public class AuthController {
         Map<String, Object> responseBody = Map.of(
             "username", response.getUsername(),
             "message", response.getMessage(),
-            "role", response.getRole()
+            "role", response.getRole(),
+            "token", response.getToken()
         );
 
         return ResponseEntity.ok(responseBody); 

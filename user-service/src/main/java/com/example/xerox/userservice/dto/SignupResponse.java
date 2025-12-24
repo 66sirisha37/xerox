@@ -1,21 +1,14 @@
 package com.example.xerox.userservice.dto;
 
 import com.example.xerox.userservice.entity.Role;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LoginResponse {
+public class SignupResponse {
     private String username;
     private String message;
     private Role role;
     private String token;
-
-    public LoginResponse(String message, String username, Role role) {
-        this.message = message;
-        this.username = username;
-        this.role = role;
-    }
 }

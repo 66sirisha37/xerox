@@ -3,11 +3,11 @@ package com.example.xerox.userservice.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.aspectj.apache.bcel.generic.RET;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.xerox.userservice.dto.CreateUserRequest;
+import com.example.xerox.userservice.dto.SignupResponse;
 import com.example.xerox.userservice.entity.User;
 import com.example.xerox.userservice.service.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,16 +26,17 @@ public class UserController {
         return service.getAllUsers();
     }
 
-    @PostMapping("/createuser")
+    @PostMapping("/signup")
     public ResponseEntity<Map<String,Object>> createUser(@RequestBody CreateUserRequest request) {
-        service.createUser(request);
-        // return ResponseEntity.ok("User created successfully");
+        SignupResponse signupResponse = service.createUser(request);
+        
         Map<String, Object> response = Map.of(
-            "status", 201,
-            "message", "User created successfully",
-            "username", request.getUsername()
+            "status", 200,
+            "message", signupResponse.getMessage(),
+            "username", signupResponse.getUsername(),
+            "role", signupResponse.getRole(),
+            "token", signupResponse.getToken()
         );
-        return ResponseEntity.status(201).body(response);
+        return ResponseEntity.status(200).body(response);
     }
 }
-

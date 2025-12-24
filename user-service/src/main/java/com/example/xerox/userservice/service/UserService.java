@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.xerox.userservice.dto.CreateUserRequest;
 import com.example.xerox.userservice.dto.LoginRequest;
 import com.example.xerox.userservice.dto.LoginResponse;
+import com.example.xerox.userservice.dto.SignupResponse;
 import com.example.xerox.userservice.entity.User;
 import com.example.xerox.userservice.exceptions.BlankFieldException;
 import com.example.xerox.userservice.exceptions.InvalidCredentialsException;
@@ -15,6 +16,7 @@ import com.example.xerox.userservice.exceptions.InvalidRoleException;
 import com.example.xerox.userservice.exceptions.PasswordMismatchException;
 import com.example.xerox.userservice.exceptions.UsernameAlreadyExistsException;
 import com.example.xerox.userservice.repository.UserRepository;
+import com.example.xerox.userservice.util.JwtUtil;
 
 
 @Service
@@ -22,10 +24,12 @@ public class UserService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public List<User> getAllUsers() {
@@ -33,10 +37,13 @@ public class UserService {
     }
 
     public User saveUser(User user) {
-        return repository.save(user);
+        if (user != null) {
+            return repository.save(user);
+        }
+        return null;
     }
 
-    public void createUser(CreateUserRequest userRequest){
+    public SignupResponse createUser(CreateUserRequest userRequest){
         if ((userRequest.getUsername().isBlank() || userRequest.getPassword().isBlank() ||
             userRequest.getConfirmPassword().isBlank() || userRequest.getEmail().isBlank())){
             throw new BlankFieldException("All fields are required");
@@ -60,7 +67,17 @@ public class UserService {
         user.setEmail(userRequest.getEmail());
         user.setRole(userRequest.getRole());
 
-        repository.save(user);
+        User savedUser = repository.save(user);
+        
+        // Generate JWT token for new user
+        String token = jwtUtil.generateToken(savedUser.getUsername(), savedUser.getRole().toString());
+        
+        return new SignupResponse(
+            savedUser.getUsername(),
+            "User created successfully",
+            savedUser.getRole(),
+            token
+        );
     }
 
 
@@ -74,10 +91,15 @@ public class UserService {
         throw new InvalidCredentialsException("Invalid username or password");
     }
 
-    return new LoginResponse(
+    String token = jwtUtil.generateToken(user.getUsername(), user.getRole().toString());
+
+    LoginResponse response = new LoginResponse(
         "User logged in successfully",
         user.getUsername(),
         user.getRole()
     );
+    response.setToken(token);
+    
+    return response;
 }
 }
